@@ -1,5 +1,7 @@
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
+
+
 // Add the Product type
 type Product = {
   id: string | number;
@@ -128,3 +130,4 @@ export async function createProduct(data: unknown) {
 
   return res.json();
 }
+

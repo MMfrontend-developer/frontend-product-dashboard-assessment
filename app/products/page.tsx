@@ -35,7 +35,7 @@ import { toast } from "react-hot-toast";
 
 const PAGE_LIMIT = 5;
 
-
+// Define categories array - shared with ProductModal
 export const PRODUCT_CATEGORIES = [
   "electronics",
   "fashion",
@@ -82,26 +82,24 @@ export default function ProductsPage() {
 
 
 
-  const { data, isLoading, isError } = useProducts(
+  const { data, isLoading, isError, error } = useProducts(
     page,
     search,
     category === "all" ? "" : category,
   );
 
-useEffect(() => {
-  if (previousCategoryRef.current !== category) {
-    setIsFilterLoading(true);
-    previousCategoryRef.current = category;
-  }
-}, [category]);
+  useEffect(() => {
+    if (previousCategoryRef.current !== category) {
+      setIsFilterLoading(true);
+      previousCategoryRef.current = category;
+    }
+  }, [category]);
 
-useEffect(() => {
-  if (!isLoading && data) {
-    setIsFilterLoading(false);
-  }
-}, [isLoading, data]);
-
-
+  useEffect(() => {
+    if (!isLoading && data) {
+      setIsFilterLoading(false);
+    }
+  }, [isLoading, data]);
 
  
   const { data: nextPageData } = useProducts(
@@ -112,11 +110,9 @@ useEffect(() => {
 
   const deleteMutation = useDeleteProduct();
 
-
-  const products = data?.products || [];
+  const products: Product[] = data?.products || [];
   const totalProducts = data?.total || 0;
 
-  
   const nextPageProducts = nextPageData?.products || [];
   const hasNextPage = nextPageProducts.length > 0;
 
@@ -150,12 +146,19 @@ useEffect(() => {
   }
 
   if (isError) {
+    console.error('Main query error:', error);
     return (
       <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 text-lg">
             Failed to load products. Please check internet connection and try again.
           </p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4"
+          >
+            Retry
+          </Button>
         </div>
       </div>
     );
@@ -291,7 +294,7 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  products.map((product: Product, index: number) => (
+                  products.map((product, index) => (
                     <TableRow 
                       key={product.id}
                       className="hover:bg-blue-50/50 transition-colors duration-150"
